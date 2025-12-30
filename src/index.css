@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+/* 1. Define your dynamic color values here */
+@layer base {
+  :root {
+    --color-bg-val: 255 255 255;
+    --color-box-val: 255 255 255;
+    --box-border-val: 229 231 235;
+    /* Using modern rgb syntax for alpha: r g b / alpha */
+    --box-sd-val: 226 232 248 / 0.5; 
+    
+    --heading-1-val: 23 37 84;
+    --heading-2-val: 31 41 55;
+    --heading-3-val: 55 65 81;
+  }
+
+  /* Dark mode overrides */
+  :root.dark {
+    --color-bg-val: 3 7 18;
+    --color-box-val: 17 24 39;
+    --box-border-val: 243 244 246 / 0.1;
+    --box-sd-val: 0 0 0 / 0; /* Transparent */
+
+    --heading-1-val: 255 255 255;
+    --heading-2-val: 243 244 248;
+    /* Fixed: 289 is invalid RGB, clamped to 255 */
+    --heading-3-val: 255 213 219; 
+  }
+  
+  /* Global styles */
+  body {
+    background-color: rgb(var(--color-bg-val));
+    font-family: "Raleway", sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Forces dark mode to trigger based on the .dark class, not system preference */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 2. Map Tailwind utilities to your variables */
+@theme {
+  /* This automatically creates classes like: bg-body, text-body, border-body */
+  --color-body: rgb(var(--color-bg-val));
+  
+  /* Creates: bg-box, text-box, etc. */
+  --color-box: rgb(var(--color-box-val));
+  
+  /* Creates: border-box-border, etc. */
+  --color-box-border: rgb(var(--box-border-val));
+  
+  /* Creates: shadow-box-sd (if used as color) or just a color utility */
+  --color-box-sd: rgb(var(--box-sd-val));
+
+  /* Creates: text-heading-1, bg-heading-1, etc. */
+  --color-heading-1: rgb(var(--heading-1-val));
+  --color-heading-2: rgb(var(--heading-2-val));
+  --color-heading-3: rgb(var(--heading-3-val));
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: scroll 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
