@@ -10,7 +10,7 @@ import { ScrollToTop } from "./components/shared/ScrollToTop";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/Saas">
       <ScrollToTop />
       <Layout title="Zedge AI | Next-Gen Automation">
         <Routes>
