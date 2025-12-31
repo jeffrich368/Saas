@@ -1,18 +1,11 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Container } from "../shared/Container";
-import logo from "../../assets/Logo.png";
 import { NavItem } from "../shared/NavItem";
 import { BtnLink } from "../shared/BtnLink";
 import { useThemeStore } from "../../store/ThemeStore";
-import { Link } from "react-router-dom";
+import logo from "../../assets/Logo.png";
 import { Menu, X, Sun, Moon } from "lucide-react";
-
-const navItems = [
-    { href: "/", text: "Home" },
-    { href: "/services", text: "Services" },
-    { href: "/about", text: "About Us" },
-    { href: "/pricing", text: "Pricing" }, 
-];
 
 export const Navbar = () => {
     const { toggleTheme, theme } = useThemeStore();
@@ -20,86 +13,103 @@ export const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
 
     const closeMenu = () => setNavIsOpened(false);
-    const toggleMenu = () => setNavIsOpened(!navIsOpened);
+    const openMenu = () => setNavIsOpened(true);
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
-        };
+        document.body.style.overflow = navIsOpened ? 'hidden' : 'unset';
+    }, [navIsOpened]);
+
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const navItems = [
+        { href: "/", text: "Home" },
+        { href: "/services", text: "Services" },
+        { href: "/about", text: "About Us" },
+        { href: "/pricing", text: "Pricing" }, 
+    ];
 
     return (
         <header 
             className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
                 isScrolled 
-                ? "py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 shadow-sm" 
-                : "py-6 bg-transparent"
+                ? "py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm" 
+                : "py-5 bg-transparent"
             }`}
         >
             <Container>
-                <nav className="w-full flex justify-between gap-6 relative items-center">
-                    {/* Logo */}
-                    <Link to="/" className="relative flex items-center gap-3 z-60" onClick={closeMenu}>
-                        <img src={logo} alt="Zedge Logo" className="w-10 h-10" />
+                <nav className="flex justify-between items-center">
+                    
+                    {/* LOGO */}
+                    <Link to="/" className="flex items-center gap-2 z-50" onClick={closeMenu}>
+                        <img src={logo} alt="Logo" className="w-9 h-9" />
                         <span className="text-lg font-semibold text-slate-900 dark:text-white">
                             Zedge AI
                         </span>
                     </Link>
 
-                    {/* 1. OVERLAY */}
+                    {/*  1. OVERLAY (This blurs the BACKpage only)  */}
                     <div 
-                        className={`fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 ${
+                        className={`fixed inset-0 bg-slate-900/40 backdrop-blur-md z-60 lg:hidden transition-all duration-300 ${
                             navIsOpened ? "opacity-100 visible" : "opacity-0 invisible"
                         }`}
                         onClick={closeMenu}
                     />
 
-                    {/* 2. SLIDE-IN MENU PANEL (Links Only) */}
+                    {/* 2. DRAWER (Solid background) */}
                     <div className={`
-                        fixed top-0 right-0 bottom-0 w-3/4 max-w-sm bg-white dark:bg-slate-900 
-                        z-50 shadow-2xl lg:shadow-none transition-transform duration-300 ease-in-out
-                        lg:static lg:w-auto lg:max-w-none lg:bg-transparent lg:translate-x-0
-                        flex flex-col lg:flex-row 
+                        fixed top-0 right-0 h-screen w-280px 
+                        bg-white dark:bg-slate-950 // Solid colors for 100% clarity
+                        z-70 shadow-2xl transition-transform duration-300 ease-in-out
+                        lg:static lg:h-auto lg:w-auto lg:bg-transparent lg:shadow-none lg:translate-x-0
+                        flex flex-col lg:flex-row
                         ${navIsOpened ? "translate-x-0" : "translate-x-full"}
                     `}>
-                        <div className="h-24 flex items-center px-8 lg:hidden">
-                            <span className="text-lg font-bold text-blue-600">Zedge AI</span>
-                        </div>
+                        {/* Sharp X Button */}
+                        <button 
+                            onClick={closeMenu}
+                            className="lg:hidden absolute top-5 right-5 p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                        >
+                            <X size={28} />
+                        </button>
                         
-                        <ul className="flex flex-col lg:flex-row gap-y-6 gap-x-8 px-8 lg:p-0 text-xl lg:text-lg font-medium text-slate-700 dark:text-slate-300 lg:flex-1 lg:justify-center">
+                        {/* Sharp Menu Links */}
+                        <ul className="flex flex-col lg:flex-row gap-y-8 lg:gap-x-8 px-10 pt-24 lg:p-0">
                             {navItems.map((item, key) => (
-                                <li key={key} onClick={closeMenu} className="border-slate-100 dark:border-slate-800 lg:border-none pb-4 lg:pb-0">
+                                <li key={key} onClick={closeMenu} className="text-slate-900 dark:text-white">
                                     <NavItem href={item.href} text={item.text} />
                                 </li>
                             ))}
+                            <li className="lg:hidden">
+                                <BtnLink text="Get Started" href="/pricing" />
+                            </li>
                         </ul>
                     </div>
 
-                    {/* 3. PERMANENT ACTIONS (Theme, CTA, and Menu Toggle) */}
-                    <div className="flex items-center gap-x-3 z-60">
-                        {/* Always visible CTA - Hidden on very small screens if preferred, or kept for UX */}
-                        <div className="hidden sm:block">
-                            <BtnLink text="Get Started" href="/pricing" />
-                        </div>
-
+                    {/* 3. HEADER ACTIONS  */}
+                    <div className="flex items-center gap-x-3 z-50">
                         <button 
                             onClick={toggleTheme} 
-                            className="p-2.5 rounded-full border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                            className="p-2 rounded-full border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
                         >
                             {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
                         </button>
 
-                        <button 
-                            onClick={toggleMenu}
-                            className="lg:hidden p-2.5 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900"
-                        >
-                            {navIsOpened ? <X size={24} /> : <Menu size={24} />}
-                        </button>
+                        {!navIsOpened && (
+                            <button 
+                                onClick={openMenu}
+                                className="lg:hidden p-2 text-slate-900 dark:text-white"
+                            >
+                                <Menu size={28} />
+                            </button>
+                        )}
                     </div>
+
                 </nav>
             </Container>
         </header>
     );
-}
+};
